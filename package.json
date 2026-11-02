@@ -1,0 +1,24 @@
+{
+  "name": "os-memory-allocation-simulator",
+  "version": "0.0.1",
+  "description": "First Fit, Best Fit & Worst Fit Memory Allocation Simulator - Operating Systems (Islamic University of Madinah)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "operating-systems",
+    "memory-management",
+    "first-fit",
+    "best-fit",
+    "worst-fit",
+    "fragmentation",
+    "compaction",
+    "silberschatz",
+    "simulation"
+  ],
+  "author": "OS Course Project Team",
+  "license": "MIT",
+  "dependencies": {}
+}
