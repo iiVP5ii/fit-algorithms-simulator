@@ -1,67 +1,142 @@
 # Memory Allocation Simulator
 
-## Project Overview
+An educational simulator for the Operating Systems course (CCS 3361) at the Islamic University of Madinah.
 
-This project is an educational memory allocation simulator developed for the Operating Systems course (CCS 3361).
+## Purpose
 
-It demonstrates how three contiguous memory allocation algorithms work:
+The project aims to explain contiguous memory allocation and compare three strategies:
 
-- First Fit
-- Best Fit
-- Worst Fit
+- **First Fit:** use the first available block that fits a process.
+- **Best Fit:** use the smallest available block that fits a process.
+- **Worst Fit:** use the largest available block that fits a process.
 
-The simulator is designed to help students understand memory allocation, fragmentation, and the differences between allocation strategies.
+The complete application is planned to visualize allocation decisions, support fixed and dynamic memory configurations, describe internal and external fragmentation, and compare algorithm metrics. **These simulator features are still being developed by the assigned teams.**
 
-## Technologies Used
+## Technology
 
-- HTML — User interface structure
-- CSS — Interface styling and animations
-- JavaScript — Simulation logic and interactions
-- Node.js — Local HTTP server
-- Git and GitHub — Version control and team collaboration
+- HTML and CSS for the interface
+- JavaScript for simulation logic and browser audio
+- Node.js for a local HTTP server
+- Node.js built-in test runner for automated tests
+- Git and GitHub for collaboration
 
-## Planned Features
+No third-party npm dependencies are required by the current local server or tests.
 
-- Fixed and dynamic memory allocation
-- First Fit, Best Fit, and Worst Fit simulations
-- Memory block and process management
-- Step-by-step allocation visualization
-- Memory utilization and fragmentation analysis
-- Algorithm comparison charts
-- Memory compaction
-- Sound effects with a mute option
+## Current implementation status
 
-Note: Features are implemented and verified progressively as team development continues.
+| Component | File | Status |
+| --- | --- | --- |
+| Local static HTTP server | `server.js` | Implemented and automatically tested |
+| Read-only server information API | `GET /api/info` | Implemented and automatically tested |
+| Sound effects and mute control | `public/js/audio.js` | Implemented and automatically tested |
+| Project setup and instructions | `README.md` | Documented |
+| Memory models, algorithms and metrics | `memory.js`, `algorithms.js`, `analyzer.js` | Team 1 — awaiting integration |
+| Application controller and visualization | `app.js`, `visualizer.js`, HTML/CSS | Team 2 — awaiting integration |
+| Charts and benchmark scenarios | `charts.js`, `presets.js` | Team 3 Student 1 — awaiting integration |
 
-## How to Run
+A page that looks empty is expected while `public/index.html` contains only a placeholder. A successful HTTP response does **not** mean that the full graphical simulator is ready.
 
-### Requirements
+## How to run locally
 
-- Node.js
-- A modern web browser
+### Prerequisites
 
-### Instructions
+1. Install a supported Node.js version with npm (Node.js 26.13.0 was used for the latest verification).
+2. Open the project repository folder in VS Code.
+3. Open **Terminal > New Terminal**, making sure the current directory contains `package.json`.
 
-1. Download or clone this repository.
-2. Open the project folder in Visual Studio Code.
-3. Open a terminal in the project root directory.
-4. Run:
+### Commands
 
-   `npm start`
+```powershell
+npm start
+```
 
-5. Open the following URL in your browser:
+Open **http://127.0.0.1:3000/** in your browser. To stop the server, press **Ctrl+C** in that terminal.
 
-   `http://127.0.0.1:3000`
+The server listens on **127.0.0.1** (your own computer only); it does not automatically publish the website on the internet.
 
-6. Use the simulator when the application interface is ready.
+### Optional port setting
 
-## Project Structure
+The default port is 3000. On Windows PowerShell you can choose another port before starting:
+
+```powershell
+$env:PORT = "3100"
+npm start
+```
+
+Then open **http://127.0.0.1:3100/**. Valid configured ports are integers from 1 through 65535. To clear the setting in that terminal afterward:
+
+```powershell
+Remove-Item Env:PORT
+```
+
+## Local server API
+
+`GET /api/info` returns JSON with non-sensitive server information:
+
+```json
+{
+  "name": "Memory Allocation Simulator",
+  "version": "0.0.1",
+  "status": "ok",
+  "scope": "local-server",
+  "plannedAlgorithms": ["First Fit", "Best Fit", "Worst Fit"]
+}
+```
+
+`status: "ok"` means that **the HTTP server** is responding. It does not mean the allocation algorithms are implemented or tested. The version is read from `package.json`. The route also supports HEAD requests without a response body.
+
+The local server supports GET and HEAD for static files under `public/`. It returns 400 for malformed URL encoding, 403 for paths attempting to escape `public/`, 404 for missing files, and 405 for unsupported methods. It also checks resolved paths to prevent serving symlinks pointing outside `public/`.
+
+## Audio module interface
+
+`public/js/audio.js` exposes one browser-side `window.soundFX` object:
+
+| Method | Purpose |
+| --- | --- |
+| `playClick()` | Button interaction |
+| `playAllocate()` | Successful allocation |
+| `playFail()` | Failed allocation |
+| `playCompact()` | Memory compaction |
+| `toggle()` | Mute/unmute; returns the new enabled state |
+
+The module uses the browser's Web Audio API to generate short tones without external audio files. It creates an AudioContext lazily, normally after a user interaction. The interface team will need to load `/js/audio.js` and call these methods from the relevant UI events when the application controller is ready.
+
+## Automated testing
+
+Run the complete local module test suite:
+
+```powershell
+npm test
+```
+
+The tests use only Node.js built-in modules and do not modify application files or contact GitHub. Test files:
+
+- `tests/audio.test.js` checks method availability, lazy AudioContext setup, all four tones, muting/unmuting, suspended audio recovery and browsers without Web Audio.
+- `tests/server.test.js` starts a temporary HTTP server on a random local port and checks HTML, JavaScript, JSON API metadata, HEAD responses, invalid methods, missing files, invalid URLs, directory traversal and invalid configured ports.
+
+**Verified on November 12, 2026:** 18 checks passed, 0 failed, 0 skipped, with Node.js 26.13.0 and npm 11.20.0 on Windows.
+
+Earlier manual browser tests also confirmed that the four sounds played and the mute toggle worked. Automated audio tests use browser API mocks, so they do not replace listening in a real browser after the final UI is integrated.
+
+## Integration checklist (pending other teams)
+
+- [ ] Team 1 integrates the three allocation algorithms, memory models and metrics.
+- [ ] Team 2 builds the actual HTML/CSS UI, simulation controls and visualization.
+- [ ] Team 2 loads `audio.js` and calls sound methods in response to actual UI events.
+- [ ] Team 3 Student 1 integrates benchmark presets and comparison charts.
+- [ ] Re-run `npm test` after integration.
+- [ ] Complete manual end-to-end scenarios, including successful/failed allocation, compaction, chart comparisons and step-by-step controls.
+- [ ] Record screenshots/results for the final report and presentation.
+
+Do not claim these integration checks have passed until the dependent modules are actually implemented and tested.
+
+## Project files
 
 ```text
 public/
   css/
-    style.css
     animations.css
+    style.css
   js/
     algorithms.js
     analyzer.js
@@ -72,44 +147,22 @@ public/
     presets.js
     visualizer.js
   index.html
-
+tests/
+  audio.test.js
+  server.test.js
 server.js
 package.json
 README.md
 ```
 
-## Team Responsibilities
+## Team responsibilities
 
-### Team 1 — Simulation Engine and Analysis
+- **Team 1 — Simulation engine and analysis:** Khubaib Basri and Azzam Al-Khattabi. Memory models, algorithms, compaction and metrics.
+- **Team 2 — Interface and interaction:** Wasel and Ahmed. UI controller, workflow, visualization and animation.
+- **Team 3 — Comparison, support and integration:** Ahmed and Haitham. Charts, presets, audio, HTTP server, documentation and integration checks.
 
-Khubaib Basri and Azzam Al-Khattabi
+**Haitham (Team 3, Student 2):** Audio module, local Node.js server, project documentation and verification of these components. Full simulator integration requires the other teams' completed modules.
 
-Responsible for memory models, allocation algorithms, compaction, and performance analysis.
+## Git collaboration
 
-### Team 2 — User Interface and Interaction
-
-Wasel and Ahmed
-
-Responsible for the application controller, visual design, memory maps, and simulation controls.
-
-### Team 3 — Comparison, Support, and Integration
-
-Ahmed and Haitham
-
-Responsible for comparison charts, benchmark presets, sound effects, local server, documentation, and integration testing.
-
-## Testing
-
-The project will be tested for:
-
-- Correct algorithm behavior
-- Successful and failed memory allocation
-- Memory utilization and fragmentation calculations
-- Step-by-step simulation functionality
-- Sound playback and muting
-- Local HTTP server operation
-- Integration between application modules
-
-## Development Status
-
-The project is currently under development. Features will be updated and tested as each team completes its assigned modules.
+Work on a personal branch and open a pull request for the project lead to review. Do not directly overwrite the shared `master` branch. Testing and writing code locally does not publish it to GitHub.
